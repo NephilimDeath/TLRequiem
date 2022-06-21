@@ -14,6 +14,9 @@ export const Terraria = {
     GetItemSettings: new NativeClass('Terraria', 'GetItemSettings'),
     Chest: new NativeClass('Terraria', 'Chest'),
     Dust: new NativeClass('Terraria', 'Dust'),
+    CombatText: new NativeClass('Terraria', 'CombatText'),
+    Collision: new NativeClass('Terraria', 'Collision'),
+    GUIPlayerCreateMenu: new NativeClass('', 'GUIPlayerCreateMenu'),
     ID: {
         NPCID: new NativeClass('Terraria.ID', 'NPCID'),
         SoundID: new NativeClass('Terraria.ID', 'SoundID'),
@@ -26,7 +29,8 @@ export const Terraria = {
         MountID: new NativeClass('Terraria.ID', 'MountID'),
         ItemUseStyleID: new NativeClass('Terraria.ID', 'ItemUseStyleID'),
         ItemHoldStyleID: new NativeClass('Terraria.ID', 'ItemHoldStyleID'),
-        PrefixID: new NativeClass('Terraria.ID', 'PrefixID')
+        PrefixID: new NativeClass('Terraria.ID', 'PrefixID'),
+        CustomCurrencyID: new NativeClass('Terraria.ID', 'CustomCurrencyID'),
     },
     Localization: {
         Language: new NativeClass('Terraria.Localization', 'Language'),
@@ -34,17 +38,42 @@ export const Terraria = {
     },
     UI: {
         ItemTooltip: new NativeClass("Terraria.UI", "ItemTooltip"),
-        ItemSorting: new NativeClass("Terraria.UI", "ItemSorting")
+        ItemSorting: new NativeClass("Terraria.UI", "ItemSorting"),
+        Chat: {
+            ChatManager: new NativeClass('Terraria.UI.Chat', 'ChatManager')
+        }
     },
     GameContent: {
-        TextureAssets: new NativeClass('Terraria.GameContent', 'TextureAssets')
+        TextureAssets: new NativeClass('Terraria.GameContent', 'TextureAssets'),
+        FontAssets: new NativeClass('Terraria.GameContent', 'FontAssets'),
+        ItemDropRules: {
+            ItemDropRule: new NativeClass('Terraria.GameContent.ItemDropRules', 'ItemDropRule'),
+            ItemDropDatabase: new NativeClass('Terraria.GameContent.ItemDropRules', 'ItemDropDatabase'),
+            CommonCode: new NativeClass('Terraria.GameContent.ItemDropRules', 'CommonCode')
+        },
+        Creative: {
+            CreativeItemSacrificesCatalog: new NativeClass('Terraria.GameContent.Creative', 'CreativeItemSacrificesCatalog'),
+            ItemsSacrificedUnlocksTracker: new NativeClass('Terraria.GameContent.Creative', 'ItemsSacrificedUnlocksTracker')
+        },
+        Events: {
+            Sandstorm: new NativeClass('Terraria.GameContent.Events', 'Sandstorm')
+        }
     },
     DataStructures: {
-        PlayerDrawSet: new NativeClass('Terraria.DataStructures', 'PlayerDrawSet')
+        PlayerDrawSet: new NativeClass('Terraria.DataStructures', 'PlayerDrawSet'),
+        PlayerDeathReason: new NativeClass('Terraria.DataStructures', 'PlayerDeathReason')
     },
     Audio: {
         SoundEngine : new NativeClass('Terraria.Audio', 'SoundEngine')
     },
+    Chat: {
+        ChatCommandProcessor: new NativeClass('Terraria.Chat', 'ChatCommandProcessor')
+    },
+    Graphics: {
+        Shaders: {
+            GameShaders: new NativeClass('Terraria.Graphics.Shaders', 'GameShaders')
+        }
+    }
 }
 
 export const Microsoft = {
@@ -52,10 +81,12 @@ export const Microsoft = {
         Framework: {
             Vector2: new NativeClass('Microsoft.Xna.Framework', 'Vector2'),
             Rectangle: new NativeClass('Microsoft.Xna.Framework', 'Rectangle'),
+            MathHelper: new NativeClass('Microsoft.Xna.Framework', 'MathHelper'),
             Graphics: {
                 Texture2D: new NativeClass('Microsoft.Xna.Framework.Graphics', 'Texture2D'),
                 SpriteEffects: new NativeClass('Microsoft.Xna.Framework.Graphics', 'SpriteEffects'),
-                Color: new NativeClass('Microsoft.Xna.Framework.Graphics', 'Color')
+                Color: new NativeClass('Microsoft.Xna.Framework.Graphics', 'Color'),
+                SpriteBatch: new NativeClass('Microsoft.Xna.Framework.Graphics', 'SpriteBatch')
             }
         }
     }
@@ -69,5 +100,7 @@ export const ReLogic = {
 }
 
 export const System = {
-    Nullable: new NativeClass('System', 'Nullable`1')
+    Nullable: new NativeClass('System', 'Nullable`1'),
+    Int32: new NativeClass('System', 'Int32'),
+    Math: new NativeClass('System', 'Math')
 }

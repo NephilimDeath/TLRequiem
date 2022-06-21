@@ -3,6 +3,7 @@ import { Terraria } from "TL/ModImports.js";
 
 export class PlayerLoader {
     static Luck = { value: 0 };
+    static PreHurtModifiers = {};
 
     static CanShoot(self, item) {
         for (let player of ModPlayer.RegisteredPlayers) {
@@ -243,5 +244,34 @@ export class PlayerLoader {
             player.player = Terraria.Main.player[proj.owner];
             player.OnHitNPCWithProj(proj, target);
         }
+    }
+    
+    static PreKill(self, damage, hitDirection, pvp) {
+        let flag = true;
+
+        for (let player of ModPlayer.RegisteredPlayers) {
+            player.player = self;
+            flag &= player.PreKill(damage, hitDirection, pvp)
+        }
+        
+        return flag;
+    }
+    
+    static Kill(self, damage, hitDirection, pvp, damageSource) {
+        for (let player of ModPlayer.RegisteredPlayers) {
+            player.player = self;
+            player.Kill(damage, hitDirection, pvp, damageSource)
+        }
+    }
+    
+    static PreHurt(self, pvp, quiet, modifier) {
+        let flag = true;
+        for (let player of ModPlayer.RegisteredPlayers) {
+            player.player = self;
+            if (!player.PreHurt(pvp, quiet, modifier)) {
+                flag = false;
+            }
+        }
+        return flag;
     }
 }

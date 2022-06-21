@@ -78,11 +78,7 @@ export class NPCLoader {
             result &= npc.PreKill(self);
         }
 
-        if (!result) {
-            return false;
-        }
-
-        return true;
+        return result;
     }
 
     static OnKill(self) {
@@ -99,5 +95,17 @@ export class NPCLoader {
         }
 
         return true;
+    }
+
+    static NPCLoot(self) {
+        for (let npc of GlobalNPC.RegisteredNPC) {
+            npc.NPCLoot(self);
+        }
+    }
+    
+    static ModifyNPCLoot(npcLoot) {
+        for (let npc of GlobalNPC.RegisteredNPC) {
+            npc.ModifyNPCLoot(npcLoot);
+        }
     }
 }

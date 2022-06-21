@@ -8,6 +8,8 @@ import { ModTexture } from "../ModTexture.js"
 
 import { ModLocalization } from "../ModLocalization.js";
 
+import { GlobalItem } from "../GlobalItem.js";
+
 export class ItemLoader {
 
     static RegisteredItems = [];
@@ -92,7 +94,7 @@ export class ItemLoader {
         const itemName = item.constructor.name;
         item.Type = item.Item.type = item.Item.netID = tl.item.registerNew(itemName);
         
-        const requiemCategory = tl.cheatMenu.addItemCategory('Requiem', 'Textures/CheatMenuCategory.webp');
+        const requiemCategory = tl.cheatMenu.addItemCategory('Requiem', 'Textures/CheatMenuCategory.png');
         tl.cheatMenu.addItemToCategory(requiemCategory, item.Type);
 
         const newItemNameTranslationIndex = Terraria.Lang._itemNameCache.length;
@@ -103,7 +105,7 @@ export class ItemLoader {
         Terraria.Lang._itemTooltipCache = Terraria.Lang._itemTooltipCache.cloneResized(newItemTooltipTranslationIndex + 1);
         Terraria.Lang._itemTooltipCache[newItemTooltipTranslationIndex] = ModLocalization.getTranslationItemTooltip(itemName);
 
-        const itemTexture = new ModTexture(item.Texture);
+        const itemTexture = new ModTexture(item.Texture, -1, item.FrameCount, item.TicksPerFrame);
         if (itemTexture.exists) {
             Terraria.GameContent.TextureAssets.Item[item.Type] = itemTexture.asset.asset;
         }
@@ -284,6 +286,10 @@ export class ItemLoader {
         }
 
         ModItem.getModItem(item.type)?.UpdateAccessory(player);
+
+        for (let globalItem of GlobalItem.RegisteredItem) {
+            globalItem.UpdateAccessory(item, player);
+        }
     }
 
     static UpdateArmorSet(player, head, body, legs) {
@@ -315,6 +321,10 @@ export class ItemLoader {
         }
 
         ModItem.getModItem(item.type)?.UpdateInventory(player);
+
+        for (let globalItem of GlobalItem.RegisteredItem) {
+            globalItem.UpdateInventory(item, player);
+        }
     }
 
     static UpdateEquip(item, player) {
@@ -323,6 +333,10 @@ export class ItemLoader {
         }
 
         ModItem.getModItem(item.type)?.UpdateEquip(player);
+
+        for (let globalItem of GlobalItem.RegisteredItem) {
+            globalItem.UpdateEquip(item, player);
+        }
     }
 
     static UpdateVanity(item, player) {
@@ -514,5 +528,23 @@ export class ItemLoader {
 
     static Shoot(item, player, position, velocity, type, damage, knockback, defaultResult = true) {
         return defaultResult && (ModItem.getModItem(item.type)?.Shoot(player, position, velocity, type, damage, knockback) ?? true);
+    }
+    
+    static OpenVanillaBag(context, player, arg) {
+        for (let globalItem of GlobalItem.RegisteredItem) {
+            globalItem.OpenVanillaBag(context, player, arg);
+        }
+    }
+    
+    static SetDefaults(item) {
+        for (let globalItem of GlobalItem.RegisteredItem) {
+            globalItem.SetDefaults(item);
+        }
+    }
+    
+    static AddRecipes() {
+        for (let globalItem of GlobalItem.RegisteredItem) {
+            globalItem.AddRecipes();
+        }
     }
 }

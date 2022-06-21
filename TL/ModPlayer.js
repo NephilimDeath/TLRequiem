@@ -130,4 +130,15 @@ export class ModPlayer {
 
     OnHitNPCWithProj(proj, target) {
     }
+    
+    PreKill(damage, hitDirection, pvp) {
+        return true;
+    }
+    
+    Kill(damage, hitDirection, pvp, damageSource) {
+    }
+
+    PreHurt(pvp, quiet, modifier) {
+        return true;
+    }
 }

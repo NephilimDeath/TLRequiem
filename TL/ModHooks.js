@@ -1,4 +1,4 @@
-import { Terraria, Microsoft } from "./ModImports.js";
+import {Terraria, Microsoft, System} from "./ModImports.js";
 
 import { ModPlayer } from "./ModPlayer.js";
 
@@ -17,7 +17,12 @@ import { ItemLoader } from "./Loaders/ItemLoader.js";
 import { CombinedLoader } from "./Loaders/CombinedLoader.js";
 
 import { PlayerLoader } from "./Loaders/PlayerLoader.js";
+
 import { NPCLoader } from "./Loaders/NPCLoader.js";
+
+import {RequiemPlayer} from "../Content/RequiemPlayer.js";
+import {StellarPendant} from "../Content/Items/Accessories/StellarPendant.js";
+import {ProjectileLoader} from "./Loaders/ProjectileLoader.js";
 
 export class ModHooks {
 	static OnHitTemp = [];
@@ -32,7 +37,6 @@ export class ModHooks {
             original(self, type);
             const projectile = ModProjectile.getModProjectile(type);
             projectile?.SetDefaults();
-            tl.log("Projectile.SetDefaults: " + JSON.stringify(projectile?.Projectile));
             Object.assign(self, projectile?.Projectile);
         });
 
@@ -47,14 +51,13 @@ export class ModHooks {
             }
         });
 
-        Terraria.Main.DrawNPCDirect.hook((original, self, mySpriteBatch, rCurrentNPC, behindTiles, screenPos) => {
-            original(self, mySpriteBatch, rCurrentNPC, behindTiles, screenPos);
-
-            for (let npc of GlobalNPC.RegisteredNPC) {
-                npc.PostDraw(self, mySpriteBatch, screenPos);
-            }
-
-        });
+        // Terraria.Main.DrawNPCDirect.hook((original, self, mySpriteBatch, rCurrentNPC, behindTiles, screenPos) => {
+        //     original(self, mySpriteBatch, rCurrentNPC, behindTiles, screenPos);
+        //
+        //     for (let npc of GlobalNPC.RegisteredNPC) {
+        //         npc.PostDraw(self, mySpriteBatch, screenPos);
+        //     }
+        // });
 
         Terraria.NPC.NPCLoot.hook((original, self) => {
             if (!NPCLoader.PreKill(self)) {
@@ -63,12 +66,8 @@ export class ModHooks {
 
             original(self);
 
+            NPCLoader.NPCLoot(self);
             NPCLoader.OnKill(self);
-
-            for (let npc of GlobalNPC.RegisteredNPC) {
-                npc.NPCLoot(self);
-            }
-
         });
 
         Terraria.Player.Update.hook((original, self, i) => {
@@ -903,13 +902,114 @@ export class ModHooks {
         Terraria.Main.Initialize_AlmostEverything.hook((original, self) => {
             original(self);
             ItemLoader.InitializeRegisteredItems();
-            ModProjectile.InitializeRegisteredProjectiles();
+            //ModProjectile.InitializeRegisteredProjectiles();
         });
 
         Terraria.Item['void SetDefaults(int Type, bool noMatCheck)'].hook((original, self, type, noMatCheck) => {
             if (type < ItemLoader.MAX_VANILLA_ID) {
-                return original(self,type, noMatCheck);
+                original(self,type, noMatCheck);
+                ItemLoader.SetDefaults(self);
+                return;
             }
+
+            self.tooltipContext = -1;
+            self.BestiaryNotes = "";
+            self.sentry = false;
+            self.canBePlacedInVanityRegardlessOfConditions = false;
+            self.DD2Summon = false;
+            self.shopSpecialCurrency = -1;
+            self.expert = false;
+            self.isAShopItem = false;
+            self.expertOnly = false;
+            self.instanced = false;
+            self.questItem = false;
+            self.fishingPole = 0;
+            self.bait = 0;
+            self.hairDye = -1;
+            self.makeNPC = 0;
+            self.dye = 0;
+            self.paint = 0;
+            self.tileWand = -1;
+            self.notAmmo = false;
+            self.netID = 0;
+            self.prefix = 0;
+            self.crit = 0;
+            self.mech = false;
+            self.flame = false;
+            self.reuseDelay = 0;
+            self.melee = false;
+            self.magic = false;
+            self.ranged = false;
+            self.summon = false;
+            self.placeStyle = 0;
+            self.buffTime = 0;
+            self.buffType = 0;
+            self.mountType = -1;
+            self.cartTrack = false;
+            self.material = false;
+            self.noWet = false;
+            self.vanity = false;
+            self.mana = 0;
+            self.wet = false;
+            self.wetCount = 0;
+            self.lavaWet = false;
+            self.channel = false;
+            self.manaIncrease = 0;
+            self.timeSinceTheItemHasBeenReservedForSomeone = 0;
+            self.noMelee = false;
+            self.noUseGraphic = false;
+            self.lifeRegen = 0;
+            self.shootSpeed = 0;
+            self.active = true;
+            self.alpha = 0;
+            self.ammo = Terraria.ID.AmmoID.None;
+            self.useAmmo = Terraria.ID.AmmoID.None;
+            self.autoReuse = false;
+            self.accessory = false;
+            self.axe = 0;
+            self.healMana = 0;
+            self.bodySlot = -1;
+            self.legSlot = -1;
+            self.headSlot = -1;
+            self.potion = false;
+            self.color = Microsoft.Xna.Framework.Graphics.Color.new();
+            self.glowMask = -1;
+            self.consumable = false;
+            self.createTile = -1;
+            self.createWall = -1;
+            self.damage = -1;
+            self.defense = 0;
+            self.hammer = 0;
+            self.healLife = 0;
+            self.holdStyle = 0;
+            self.knockBack = 0;
+            self.maxStack = 1;
+            self.pick = 0;
+            self.rare = 0;
+            self.scale = 1;
+            self.shoot = 0;
+            self.stack = 1;
+            self.tileBoost = 0;
+            self.useStyle = 0;
+            self.useTime = 100;
+            self.useAnimation = 100;
+            self.value = 0;
+            self.useTurn = false;
+            self.buy = false;
+            self.handOnSlot = -1;
+            self.handOffSlot = -1;
+            self.backSlot = -1;
+            self.frontSlot = -1;
+            self.shoeSlot = -1;
+            self.waistSlot = -1;
+            self.wingSlot = -1;
+            self.shieldSlot = -1;
+            self.neckSlot = -1;
+            self.faceSlot = -1;
+            self.balloonSlot = -1;
+            self.uniqueStack = false;
+            self.favorited = false;
+            self.type = type;
             const item = ItemLoader.getModItem(type);
             item?.SetDefaults();
             Object.assign(self, item?.Item);
@@ -1020,10 +1120,429 @@ export class ModHooks {
         });
 
         Terraria.Player.UpdateLifeRegen.hook((original, self) => {
+            let flag = false;
+            if (self.shinyStone && Math.abs(self.velocity.X) < 0.05 && Math.abs(self.velocity.Y) < 0.05 && self.itemAnimation === 0) {
+                flag = true;
+            }
+
+            if (self.poisoned) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+                
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 4;
+            }
+
+            if (self.venom) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 30;
+            }
+
+            if (self.onFire) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 8;
+            }
+
+            if (self.onFire3) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 8;
+            }
+
+            if (self.onFrostBurn) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 16;
+            }
+
+            if (self.onFrostBurn2) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 16;
+            }
+
+            if (self.onFire2) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 24;
+            }
+
+            if (self.burned) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 60;
+                self.moveSpeed *= 0.5;
+            }
+
+            if (self.suffocating) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 40;
+            }
+
+            if (self.electrified) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 8;
+                if (self.controlLeft || self.controlRight) {
+                    self.lifeRegen -= 32;
+                }
+            }
+
+            if (self.tongued && Terraria.Main.expertMode) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                self.lifeRegenTime = 0;
+                self.lifeRegen -= 100;
+            }
+            
             PlayerLoader.UpdateBadLifeRegen(self);
+
+            if (self.honey && self.lifeRegen < 0) {
+                self.lifeRegen += 4;
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+            }
+
+            if (self.lifeRegen < 0 && self.nebulaLevelLife > 0) {
+                self.lifeRegen = 0;
+            }
+
+            if (flag && self.lifeRegen < 0) {
+                self.lifeRegen /= 2;
+            }
+
+            self.lifeRegenTime++;
+            if (self.crimsonRegen) {
+                self.lifeRegenTime++;
+            }
+
+            if (self.soulDrain > 0) {
+                self.lifeRegenTime += 2;
+            }
+
+            if (flag) {
+                if (self.lifeRegenTime > 90 && self.lifeRegenTime < 1800) {
+                    self.lifeRegenTime = 1800;
+                }
+
+                self.lifeRegenTime += 4;
+                self.lifeRegen += 4;
+            }
+
+            if (self.honey) {
+                self.lifeRegenTime += 2;
+                self.lifeRegen += 2;
+            }
+
+            if (self.starving) {
+                if (self.lifeRegen > 0) {
+                    self.lifeRegen = 0;
+                }
+
+                if (self.lifeRegenCount > 0) {
+                    self.lifeRegenCount = 0;
+                }
+
+                if (self.lifeRegenTime > 0) {
+                    self.lifeRegenTime = 0;
+                }
+
+                let num = 3000;
+                let num2 = 120 * self.statLifeMax2 / num;
+                if (num2 < 4) {
+                    num2 = 4;
+                }
+
+                self.lifeRegen = -num2;
+            }
+
+            if (self.soulDrain > 0) {
+                let num3 = (5 + self.soulDrain) / 2;
+                self.lifeRegenTime += num3;
+                self.lifeRegen += num3;
+            }
+
+            if (self.heartyMeal) {
+                let num4 = 3 * 120 / 60;
+                self.lifeRegen += num4;
+            }
+
+            if (self.whoAmI === Terraria.Main.myPlayer && Terraria.Main.SceneMetrics.HasCampfire) {
+                self.lifeRegen++;
+            }
+
+            if (self.whoAmI === Terraria.Main.myPlayer && Terraria.Main.SceneMetrics.HasHeartLantern) {
+                self.lifeRegen += 2;
+            }
+            
             PlayerLoader.UpdateLifeRegen(self);
 
-            original(self);
+            if (self.bleed) {
+                self.lifeRegenTime = 0;
+            }
+
+            let num5 = 0;
+            if (self.lifeRegenTime >= 300) {
+                num5 += 1;
+            }
+
+            if (self.lifeRegenTime >= 600) {
+                num5 += 1;
+            }
+
+            if (self.lifeRegenTime >= 900) {
+                num5 += 1;
+            }
+
+            if (self.lifeRegenTime >= 1200) {
+                num5 += 1;
+            }
+
+            if (self.lifeRegenTime >= 1500) {
+                num5 += 1;
+            }
+
+            if (self.lifeRegenTime >= 1800) {
+                num5 += 1;
+            }
+
+            if (self.lifeRegenTime >= 2400) {
+                num5 += 1;
+            }
+
+            if (self.lifeRegenTime >= 3000) {
+                num5 += 1;
+            }
+
+            if (flag) {
+                let num6 = self.lifeRegenTime - 3000;
+                num6 /= 300;
+                if (num6 > 0) {
+                    if (num6 > 30) {
+                        num6 = 30;
+                    }
+
+                    num5 += num6;
+                }
+            }
+            else if (self.lifeRegenTime >= 3600) {
+                num5 += 1;
+                self.lifeRegenTime = 3600;
+            }
+
+            if (self.sitting.isSitting || self.sleeping.isSleeping) {
+                self.lifeRegenTime += 10;
+                num5 *= 1.5;
+            }
+
+            num5 = ((self.velocity.X !== 0 && self.grappling[0] <= 0) ? (num5 * 0.5) : (num5 * 1.25));
+            if (self.crimsonRegen) {
+                num5 *= 1.5;
+            }
+
+            if (self.shinyStone) {
+                num5 *= 1.1;
+            }
+
+            if (self.whoAmI === Terraria.Main.myPlayer && Terraria.Main.SceneMetrics.HasCampfire) {
+                num5 *= 1.1;
+            }
+
+            if (Terraria.Main.expertMode && !self.wellFed) {
+                num5 = ((!self.shinyStone) ? (num5 / 2) : (num5 * 0.75));
+            }
+
+            if (self.rabid) {
+                num5 = ((!self.shinyStone) ? (num5 / 2) : (num5 * 0.75));
+            }
+            
+            let num7 = self.statLifeMax2 / 400 * 0.85 + 0.15;
+            num5 *= num7;
+            self.lifeRegen += Math.round(num5);
+            self.lifeRegenCount += self.lifeRegen;
+            if (self.palladiumRegen) {
+                self.lifeRegenCount += 4;
+            }
+
+            if (flag && self.lifeRegen > 0 && self.statLife < self.statLifeMax2) {
+                self.lifeRegenCount++;
+                if (flag && (Terraria.Main.rand['int Next(int maxValue)'](30000) < self.lifeRegenTime || Terraria.Main.rand['int Next(int maxValue)'](30) === 0)) {
+                    let num8 = Terraria.Dust.NewDust(self.position, self.width, self.height, 55, 0, 0, 200, Microsoft.Xna.Framework.Graphics.Color.new(), 0.5);
+                    Terraria.Main.dust[num8].noGravity = true;
+                    Terraria.Main.dust[num8].velocity = Microsoft.Xna.Framework.Vector2['Vector2 op_Multiply(Vector2 value, float scaleFactor)'](Terraria.Main.dust[num8].velocity, 0.75);
+                    Terraria.Main.dust[num8].fadeIn = 1.3;
+                    let vector = Microsoft.Xna.Framework.Vector2.new();
+                    vector.X = Terraria.Main.rand['int Next(int minValue, int maxValue)'](-100, 101);
+                    vector.Y = Terraria.Main.rand['int Next(int minValue, int maxValue)'](-100, 101);
+                    Microsoft.Xna.Framework.Vector2['void Normalize()'](vector);
+                    vector = Microsoft.Xna.Framework.Vector2['Vector2 op_Multiply(Vector2 value, float scaleFactor)'](vector, Terraroa.Main.rand['int Next(int minValue, int maxValue)'](50, 100) * 0.04);
+                    Terraria.Main.dust[num8].velocity = vector;
+                    Microsoft.Xna.Framework.Vector2['void Normalize()'](vector);
+                    vector = Microsoft.Xna.Framework.Vector2['Vector2 op_Multiply(Vector2 value, float scaleFactor)'](vector, 34);
+                    Terraria.Main.dust[num8].position = Microsoft.Xna.Framework.Vector2.op_Subtraction(self.Center, vector);
+                }
+            }
+
+            while (self.lifeRegenCount >= 120) {
+                self.lifeRegenCount -= 120;
+                if (self.statLife < self.statLifeMax2) {
+                    self.statLife++;
+                    if (self.crimsonRegen) {
+                        for (let i = 0; i < 10; i++) {
+                            let num9 = Terraria.Dust.NewDust(self.position, self.width, self.height, 5, 0, 0, 175, Microsoft.Xna.Framework.Graphics.Color.new(), 1.75);
+                            Terraria.Main.dust[num9].noGravity = true;
+                            Terraria.Main.dust[num9].velocity = Microsoft.Xna.Framework.Vector2['Vector2 op_Multiply(Vector2 value, float scaleFactor)'](Main.dust[num9].velocity, 0.75);
+                            let num10 = Terraria.Main.rand['int Next(int minValue, int maxValue)'](-40, 41);
+                            let num11 = Terraria.Main.rand['int Next(int minValue, int maxValue)'](-40, 41);
+                            Terraria.Main.dust[num9].position.X += num10;
+                            Terraria.Main.dust[num9].position.Y += num11;
+                            Terraria.Main.dust[num9].velocity.X = -num10 * 0.075;
+                            Terraria.Main.dust[num9].velocity.Y = -num11 * 0.075;
+                        }
+                    }
+                }
+
+                if (self.statLife > self.statLifeMax2) {
+                    self.statLife = self.statLifeMax2;
+                }
+            }
+
+            if (self.burned || self.suffocating || (self.tongued && Terraria.Main.expertMode)) {
+                while (self.lifeRegenCount <= -600) {
+                    self.lifeRegenCount += 600;
+                    self.statLife -= 5;
+                    let rect = Microsoft.Xna.Framework.Rectangle.new();
+                    rect.X = self.position.X;
+                    rect.Y = self.position.Y;
+                    rect.Width = self.width;
+                    rect.Height = self.height;
+                    Terraria.CombatText['int NewText(Rectangle location, Color color, int amount, bool dramatic, bool dot)']
+                    (rect, Terraria.CombatText.LifeRegen, 5, false, true);
+                    if (self.statLife <= 0 && self.whoAmI === Terraria.Main.myPlayer) {
+                        if (self.suffocating) {
+                            self.KillMe(Terraria.DataStructures.PlayerDeathReason.ByOther(7), 10.0, 0, false);
+                        } else {
+                            self.KillMe(Terraria.DataStructures.PlayerDeathReason.ByOther(8), 10.0, 0, false);
+                        }
+                    }
+                }
+
+                return;
+            }
+
+            if (self.starving) {
+                let num12 = self.statLifeMax2 / 50;
+                if (num12 < 2) {
+                    num12 = 2;
+                }
+
+                let num13 = (self.ZoneDesert || self.ZoneSnow) ? (num12 * 2) : num12;
+                let num14 = 120 * num12;
+                while (self.lifeRegenCount <= -num14) {
+                    self.lifeRegenCount += num14;
+                    self.statLife -= num13;
+                    let rect = Microsoft.Xna.Framework.Rectangle.new();
+                    rect.X = self.position.X;
+                    rect.Y = self.position.Y;
+                    rect.Width = self.width;
+                    rect.Height = self.height;
+                    Terraria.CombatText['int NewText(Rectangle location, Color color, int amount, bool dramatic, bool dot)']
+                    (rect, Terraria.CombatText.LifeRegen, num13, false, true);
+                    if (self.statLife <= 0 && self.whoAmI === Terraria.Main.myPlayer) {
+                        self.KillMe(Terraria.DataStructures.PlayerDeathReason.ByOther(18), 10.0, 0, false);
+                    }
+                }
+
+                return;
+            }
+
+            while (self.lifeRegenCount <= -120) {
+                if (self.lifeRegenCount <= -480) {
+                    self.lifeRegenCount += 480;
+                    self.statLife -= 4;
+                    let rect = Microsoft.Xna.Framework.Rectangle.new();
+                    rect.X = self.position.X;
+                    rect.Y = self.position.Y;
+                    rect.Width = self.width;
+                    rect.Height = self.height;
+                    Terraria.CombatText['int NewText(Rectangle location, Color color, int amount, bool dramatic, bool dot)']
+                    (rect, Terraria.CombatText.LifeRegen, 4, false, true);
+                } else if (self.lifeRegenCount <= -360) {
+                    self.lifeRegenCount += 360;
+                    self.statLife -= 3;
+                    let rect = Microsoft.Xna.Framework.Rectangle.new();
+                    rect.X = self.position.X;
+                    rect.Y = self.position.Y;
+                    rect.Width = self.width;
+                    rect.Height = self.height;
+                    Terraria.CombatText['int NewText(Rectangle location, Color color, int amount, bool dramatic, bool dot)']
+                    (rect, Terraria.CombatText.LifeRegen, 3, false, true);
+                } else if (self.lifeRegenCount <= -240) {
+                    self.lifeRegenCount += 240;
+                    self.statLife -= 2;
+                    let rect = Microsoft.Xna.Framework.Rectangle.new();
+                    rect.X = self.position.X;
+                    rect.Y = self.position.Y;
+                    rect.Width = self.width;
+                    rect.Height = self.height;
+                    Terraria.CombatText['int NewText(Rectangle location, Color color, int amount, bool dramatic, bool dot)']
+                    (rect, Terraria.CombatText.LifeRegen, 2, false, true);
+                } else {
+                    self.lifeRegenCount += 120;
+                    self.statLife--;
+                    let rect = Microsoft.Xna.Framework.Rectangle.new();
+                    rect.X = self.position.X;
+                    rect.Y = self.position.Y;
+                    rect.Width = self.width;
+                    rect.Height = self.height;
+                    Terraria.CombatText['int NewText(Rectangle location, Color color, int amount, bool dramatic, bool dot)']
+                    (rect, Terraria.CombatText.LifeRegen, 1, false, true);
+                }
+
+                if (self.statLife <= 0 && self.whoAmI === Terraria.Main.myPlayer) {
+                    if (self.poisoned || self.venom) {
+                        self.KillMe(Terraria.DataStructures.PlayerDeathReason.ByOther(9), 10.0, 0, false);
+                    } else if (self.electrified) {
+                        self.KillMe(Terraria.DataStructures.PlayerDeathReason.ByOther(10), 10.0, 0, false);
+                    } else {
+                        self.KillMe(Terraria.DataStructures.PlayerDeathReason.ByOther(8), 10.0, 0, false);
+                    }
+                }
+            }
         });
 
         Terraria.Player.UpdateDead.hook((original, self) => {
@@ -1480,29 +1999,31 @@ export class ModHooks {
             let num2 = -self.statLifeMax2;
             for (let i = 0; i < 58; i++) {
                 const item = self.inventory[i];
-                if ((item.type < ItemLoader.MAX_VANILLA_ID || item.type >= ItemLoader.MAX_VANILLA_ID && CombinedLoader.CanUseItem(self, item)) &&
-                item.stack > 0 && item.potion && item.healLife > 0) {
-                    let num3 = item.healLife - num;
-                    if (item.type >= ItemLoader.MAX_VANILLA_ID) {
-                        num3 = CombinedLoader.GetHealLife(item, self, true) - num;
-                    }
+                if (item.stack <= 0 || item.type <= 0 || !item.potion || item.healLife <= 0) {
+                    continue;
+                }
+                
+                if (item.type >= ItemLoader.MAX_VANILLA_ID && !CombinedLoader.CanUseItem(self, item)){
+                    continue;
+                }
 
-                    if (item.type === 227 && num3 < 0) {
-                        num3 += 30;
-                        if (num3 > 0) {
-                            num3 = 0;
-                        }
-                    }
+                let num3 = CombinedLoader.GetHealLife(item, self, true) - num;
 
-                    if (num2 < 0) {
-                        if (num3 > num2) {
-                            result = item;
-                            num2 = num3;
-                        }
-                    } else if (num3 < num2 && num3 >= 0) {
+                if (item.type === 227 && num3 < 0) {
+                    num3 += 30;
+                    if (num3 > 0) {
+                        num3 = 0;
+                    }
+                }
+
+                if (num2 < 0) {
+                    if (num3 > num2) {
                         result = item;
                         num2 = num3;
                     }
+                } else if (num3 < num2 && num3 >= 0) {
+                    result = item;
+                    num2 = num3;
                 }
             }
 
@@ -1515,23 +2036,22 @@ export class ModHooks {
             if (flag) {
                 return;
             }
-
-            while (true) {
-                if (item.stack > 0 && item.healMana > 0 && (self.potionDelay === 0 || item.potion)) {
-                    break;
-                }
-
-                if (item.type < ItemLoader.MAX_VANILLA_ID) {
-                    return original(self);
-                }
-
+            if (item === null) {
                 return;
             }
 
             Terraria.Audio.SoundEngine['SoundEffectInstance PlaySound(LegacySoundStyle type, Vector2 position)'](item.UseSound, self.position);
             if (item.potion) {
-                self.potionDelay = self.potionDelayTime;
-                self.AddBuff(21, self.potionDelay, true, false);
+                if (item.type === 227) {
+                    self.potionDelay = self.restorationDelayTime;
+                    self.AddBuff(21, self.potionDelay, true, false);
+                } else if (item.type === 5) {
+                    self.potionDelay = self.mushroomDelayTime;
+                    self.AddBuff(21, self.potionDelay, true, false);
+                } else {
+                    self.potionDelay = self.potionDelayTime;
+                    self.AddBuff(21, self.potionDelay, true, false);
+                }
             }
 
             ItemLoader.UseItem(item, self);
@@ -1561,12 +2081,12 @@ export class ModHooks {
                 }
             }
 
-            if (ItemLoader.ConsumeItem(item, self)) {
+            if (item.type < ItemLoader.MAX_VANILLA_ID || ItemLoader.ConsumeItem(item, self)) {
                 item.stack--;
             }
 
             if (item.stack <= 0) {
-                Terraria.Item.TurnToAir(item)
+                Terraria.Item.TurnToAir(item);
             }
         });
 
@@ -1668,6 +2188,9 @@ export class ModHooks {
                     nextSlot++;
                 }
             }
+            for (let j = 0; j < nextSlot; j++) {
+                self.item[j].isAShopItem = true;
+            }
 
             NPCLoader.SetupShop(type, self, nextSlot);
         });
@@ -1720,6 +2243,161 @@ export class ModHooks {
         Terraria.Projectile.StatusNPC.hook((original, self, i) => {
             original(self, i);
             PlayerLoader.OnHitNPCWithProj(self, Terraria.Main.npc[i]);
+        });
+        
+        Terraria.Player.KillMe.hook((original, self, damageSource, dmg, hitDirection, pvp) => {
+            if (!PlayerLoader.PreKill(self, dmg, hitDirection, pvp)) {
+                return;
+            }
+
+            original(self, damageSource, dmg, hitDirection, pvp);
+            
+            PlayerLoader.Kill(self, dmg, hitDirection, pvp, damageSource)
+        });
+        
+        Terraria.Player.Hurt.hook((original, self, damageSource, Damage, hitDirection, pvp, quiet, Crit, cooldownCounter) => {
+            let modifiers = PlayerLoader.PreHurtModifiers;
+            modifiers.damage = Damage;
+            modifiers.hitDirection = hitDirection;
+            modifiers.crit = Crit;
+            
+            if (!PlayerLoader.PreHurt(self, pvp, quiet, modifiers)) {
+                return 0.0;
+            }
+            
+            Damage = modifiers.damage;
+            hitDirection = modifiers.hitDirection;
+            Crit = modifiers.crit;
+
+            const result = original(self, damageSource, Damage, hitDirection, pvp, quiet, Crit, cooldownCounter);
+            return result;
+        });
+        
+        Terraria.Player.GetWeaponDamage.hook((original, self, sItem) => {
+            let result = original(self, sItem);
+            if (RequiemPlayer.undeadHunter && sItem.ranged) {
+                result += 2;
+            }
+            return result;
+        });
+        
+        Terraria.Projectile.AI.hook((original, self) => {
+           original(self);
+            if (StellarPendant.active && (self.type === 92 || self.type === 9) && Terraria.Main.LocalPlayer.HeldItem.type !== 65) {
+               self.tileCollide = false;
+           }
+        });
+        
+        Terraria.GUIPlayerCreateMenu.SetupStartingItems.hook((original) => {
+            original();
+            
+            let inventorySlot = 0;
+            const flag = Terraria.WorldGen.CopperTierOre == 7;
+            const player = Terraria.Main.PendingPlayer;
+            if (player.difficulty !== 3) {
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](flag ? 3507 : 3501);
+                player.inventory[inventorySlot++].Prefix(-1);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](3509);
+                player.inventory[inventorySlot++].Prefix(-1);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](3506);
+                player.inventory[inventorySlot++].Prefix(-1);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](flag ? 3504 : 3498);
+                player.inventory[inventorySlot++].Prefix(-1);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](40);
+                player.inventory[inventorySlot++].stack = 100;
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](3069);
+                player.inventory[inventorySlot++].Prefix(-1);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](4281);
+                player.inventory[inventorySlot++].Prefix(-1);
+                player.inventory[inventorySlot++]['void SetDefaults(int Type)'](109);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](flag ? 3505 : 3499);
+                player.inventory[inventorySlot++].Prefix(-1);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](166);
+                player.inventory[inventorySlot++].stack = 10;
+                player.inventory[inventorySlot++]['void SetDefaults(int Type)'](2322);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](296);
+                player.inventory[inventorySlot++].stack = 2;
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](290);
+                player.inventory[inventorySlot++].stack = 3;
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](291);
+                player.inventory[inventorySlot++].stack = 2;
+                player.inventory[inventorySlot++]['void SetDefaults(int Type)'](298);
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](2350);
+                player.inventory[inventorySlot++].stack = 3;
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](8);
+                player.inventory[inventorySlot++].stack = 25;
+                player.inventory[inventorySlot]['void SetDefaults(int Type)'](48);
+                player.inventory[inventorySlot++].stack = 3;
+            }
+        });
+        
+        Terraria.Player.OpenBossBag.hook((original, self, type) => {
+            ItemLoader.OpenVanillaBag("bossBag", self, type);
+            
+            original(self, type); 
+        });
+        
+        Terraria.Player.OpenFishingCrate.hook((original, self, crateItemID) => {
+            ItemLoader.OpenVanillaBag('crate', self, crateItemID);
+            
+            original(self, crateItemID); 
+        });
+
+        Terraria.Player.openPresent.hook((original, self, itemType) => {
+            ItemLoader.OpenVanillaBag('present', self, 0);
+            
+            original(self, itemType);
+        });
+        
+        Terraria.Player.OpenShadowLockbox.hook((original, self) => {
+            ItemLoader.OpenVanillaBag('obsidianLockBox', self, 0);
+            
+            original(self); 
+        });
+
+        Terraria.Player.OpenLockBox.hook((original, self) => {
+            ItemLoader.OpenVanillaBag('lockBox', self, 0);
+
+            original(self);
+        });
+
+        Terraria.Player.OpenHerbBag.hook((original, self) => {
+            ItemLoader.OpenVanillaBag('herbBag', self, 0);
+
+            original(self);
+        });
+
+        Terraria.Player.OpenGoodieBag.hook((original, self) => {
+            ItemLoader.OpenVanillaBag('goodieBag', self, 0);
+
+            original(self);
+        });
+        
+        Terraria.GameContent.ItemDropRules.ItemDropDatabase.Populate.hook((original, self) => {
+           original(self);
+           
+           NPCLoader.ModifyNPCLoot(self);
+        });
+        
+        Terraria.Projectile.Kill.hook((original, self) => {
+           original(self); 
+           
+           ProjectileLoader.Kill(self);
+        });
+        
+        Terraria.Player.GetItemGrabRange.hook((original, self, item) => {
+            let result = original(self, item);
+            if (RequiemPlayer.hallowTreasureMagnet) {
+                result += 450;
+            }
+            
+            return result;
+        });
+        
+        Terraria.Chest.SetupRecipes.hook((original) => {
+           original();
+           
+           ItemLoader.AddRecipes();
         });
 
         ModHooks.isInitialized = true;
